@@ -26,7 +26,7 @@ const createNew = async (reqBody) => {
   } catch (error) { throw error }
 }
 
-const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
+const update = async (cardId, reqBody, cardCoverFile, attachmentFile, userInfo) => {
   try {
     const updateData = {
       ...reqBody,
@@ -36,10 +36,22 @@ const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
     let updatedCard = {}
 
     if (cardCoverFile) {
+      // Xử lý upload ảnh cover
       const uploadResult = await CloudinaryProvider.streamUpload(cardCoverFile.buffer, 'card-covers')
       updatedCard = await cardModel.update(cardId, { cover: uploadResult.secure_url })
+    } else if (attachmentFile) {
+      // Xử lý upload file đính kèm
+      const uploadResult = await CloudinaryProvider.streamUpload(attachmentFile.buffer, 'card-attachments')
+      const attachmentData = {
+        fileName: attachmentFile.originalname,
+        fileUrl: uploadResult.secure_url,
+        fileType: attachmentFile.mimetype,
+        uploadedAt: Date.now(),
+        uploadedBy: userInfo._id
+      }
+      updatedCard = await cardModel.pushNewAttachment(cardId, attachmentData)
     } else if (updateData.commentToAdd) {
-      // Tạo dữ liệu comment để thêm vào Database, cần bổ sung thêm những field cần thiết
+      // Xử lý thêm comment
       const commentData = {
         ...updateData.commentToAdd,
         commentedAt: Date.now(),
@@ -48,13 +60,12 @@ const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
       }
       updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
     } else if (updateData.incomingMemberInfo) {
-      // Trường hợp ADD hoặc REMOVE thành viên ra khỏi Card
+      // Xử lý thêm/xóa thành viên
       updatedCard = await cardModel.updateMembers(cardId, updateData.incomingMemberInfo)
     } else {
-      // Các trường hợp update chung như title, description
+      // Các trường hợp update thông thường
       updatedCard = await cardModel.update(cardId, updateData)
     }
-
 
     return updatedCard
   } catch (error) { throw error }

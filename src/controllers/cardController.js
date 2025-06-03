@@ -16,9 +16,14 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const cardId = req.params.id
-    const cardCoverFile = req.file
     const userInfo = req.jwtDecoded
-    const updatedCard = await cardService.update(cardId, req.body, cardCoverFile, userInfo)
+    
+    // Lấy files từ req.files thay vì req.file vì sử dụng multer.fields
+    const files = req.files || {}
+    const cardCoverFile = files.cardCover ? files.cardCover[0] : null
+    const attachmentFile = files.attachment ? files.attachment[0] : null
+    
+    const updatedCard = await cardService.update(cardId, req.body, cardCoverFile, attachmentFile, userInfo)
 
     res.status(StatusCodes.OK).json(updatedCard)
   } catch (error) { next(error) }

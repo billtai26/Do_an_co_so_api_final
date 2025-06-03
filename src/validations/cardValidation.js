@@ -24,10 +24,16 @@ const createNew = async (req, res, next) => {
 }
 
 const update = async (req, res, next) => {
-  // Lưu ý không dùng hàm required() trong trường hợp Update
   const correctCondition = Joi.object({
     title: Joi.string().min(3).max(50).trim().strict(),
-    description: Joi.string().optional()
+    description: Joi.string().optional(),
+    commentToAdd: Joi.object({
+      content: Joi.string().required().min(1).trim().strict()
+    }).optional(),
+    incomingMemberInfo: Joi.object({
+      userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+      action: Joi.string().valid('ADD', 'REMOVE').required()
+    }).optional()
   })
 
   try {
