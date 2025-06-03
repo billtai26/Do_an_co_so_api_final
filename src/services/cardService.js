@@ -42,8 +42,12 @@ const update = async (cardId, reqBody, cardCoverFile, attachmentFile, userInfo) 
     } else if (attachmentFile) {
       // Xử lý upload file đính kèm
       const uploadResult = await CloudinaryProvider.streamUpload(attachmentFile.buffer, 'card-attachments')
+
+      // Decode filename để đảm bảo hiển thị đúng Unicode
+      const decodedFileName = decodeURIComponent(escape(attachmentFile.originalname))
+
       const attachmentData = {
-        fileName: attachmentFile.originalname,
+        fileName: decodedFileName,
         fileUrl: uploadResult.secure_url,
         fileType: attachmentFile.mimetype,
         uploadedAt: Date.now(),
