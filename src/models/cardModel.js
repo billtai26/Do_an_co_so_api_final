@@ -20,6 +20,13 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string().optional(),
 
   cover: Joi.string().default(null),
+  attachments: Joi.array().items({
+    fileName: Joi.string().required(),
+    fileUrl: Joi.string().required(),
+    fileType: Joi.string().required(),
+    uploadedAt: Joi.date().timestamp(),
+    uploadedBy: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  }).default([]),
   memberIds: Joi.array().items(
     Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
   ).default([]),
@@ -141,6 +148,17 @@ const updateMembers = async (cardId, incomingMemberInfo) => {
   } catch (error) { throw new Error(error) }
 }
 
+const pushNewAttachment = async (cardId, attachmentData) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(cardId) },
+      { $push: { attachments: attachmentData } },
+      { returnDocument: 'after' }
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
@@ -149,5 +167,6 @@ export const cardModel = {
   update,
   deleteManyByColumnId,
   unshiftNewComment,
-  updateMembers
+  updateMembers,
+  pushNewAttachment
 }
