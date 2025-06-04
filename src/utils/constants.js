@@ -36,3 +36,9 @@ export const CARD_MEMBER_ACTIONS = {
   ADD: 'ADD',
   REMOVE: 'REMOVE'
 }
+
+export const CARD_STATUS = {
+  TO_DO: 'TO DO',
+  IN_PROGRESS: 'IN PROGRESS',
+  DONE: 'DONE'
+}
