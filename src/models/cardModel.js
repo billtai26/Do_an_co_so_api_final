@@ -8,7 +8,7 @@ import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
-import { CARD_MEMBER_ACTIONS } from '~/utils/constants'
+import { CARD_MEMBER_ACTIONS, CARD_STATUS } from '~/utils/constants'
 
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
@@ -18,6 +18,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
 
   title: Joi.string().required().min(3).max(50).trim().strict(),
   description: Joi.string().optional(),
+  status: Joi.string().valid(CARD_STATUS.TO_DO, CARD_STATUS.IN_PROGRESS, CARD_STATUS.DONE).default(CARD_STATUS.TO_DO),
 
   cover: Joi.string().default(null),
   attachments: Joi.array().items({
