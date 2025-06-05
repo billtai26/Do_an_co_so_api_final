@@ -1,8 +1,3 @@
-/**
- * Updated by trungquandev.com's author on August 17 2023
- * YouTube: https://youtube.com/@trungquandev
- * "A bit of fragrance clings to the hand that gives flowers!"
- */
 import { StatusCodes } from 'http-status-codes'
 import { cardService } from '~/services/cardService'
 
@@ -17,12 +12,12 @@ const update = async (req, res, next) => {
   try {
     const cardId = req.params.id
     const userInfo = req.jwtDecoded
-    
+
     // Lấy files từ req.files thay vì req.file vì sử dụng multer.fields
     const files = req.files || {}
     const cardCoverFile = files.cardCover ? files.cardCover[0] : null
     const attachmentFile = files.attachment ? files.attachment[0] : null
-    
+
     const updatedCard = await cardService.update(cardId, req.body, cardCoverFile, attachmentFile, userInfo)
 
     res.status(StatusCodes.OK).json(updatedCard)

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
